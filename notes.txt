@@ -1,0 +1,15 @@
+Category
+========
+Name:string
+Description:
+URL:
+
+
+Item
+====
+Name:string
+Description:string
+Category:id
+Price:number
+Stock:number
+URL:string
