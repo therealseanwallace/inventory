@@ -9,8 +9,13 @@ const CategorySchema = new Schema({
     minLength: 3,
     maxLength: 30,
   },
-  description: { type: String, maxLength: 200 },
-  url: { type: String, required: true },
+  description: { type: String, maxLength: 200 }
+});
+
+// Virtual for category's URL
+CategorySchema.virtual("url").get(function () {
+  // We don't use an arrow function as we'll need the this object
+  return `/inventory/category/${this.id}`;
 });
 
 export default mongoose.model("Category", CategorySchema);
