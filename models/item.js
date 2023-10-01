@@ -18,7 +18,7 @@ const ItemSchema = new Schema({
 // Virtual for item's URL
 ItemSchema.virtual("url").get(function () {
   // We don't use an arrow function as we'll need the this object
-  return `/inventory/category/${this.category}/${this.id}`;
+  return `/inventory/item/${this.id}`;
 });
 
 export default mongoose.model("Item", ItemSchema);
