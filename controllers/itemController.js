@@ -20,14 +20,40 @@ const index = asyncHandler(async (req, res, next) => {
   })
 })
 
-// Display list of all Categories.
+// Display list of all Items.
 const itemList = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Item list");
+  /* await Item.find({}, "name", (err, items) => {
+    if(err) {
+      throw new Error(`Error getting items! ${err.stack}`)
+    } else {
+      res.render("item_list", { title: "All items", items})
+    }
+  }); */
+
+  const items = await Item.find({});
+
+  res.render("all_items", {
+    title: "All items",
+    items
+  })
+
 });
 
 // Display detail page for a specific Item.
 const itemDetail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Item detail: ${req.params.id}`);
+  const item = await Item.findOne({_id: req.params.id});
+
+  if (!item) {
+    const error = new Error(`Item with ID ${req.params.id} not found!`);
+    error.status = 404;
+    return next(error);
+  }
+
+  const category = await Category.findOne({_id: item.category})
+  res.render("item_detail", {
+    item,
+    cat: category.name
+  });
 });
 
 // Display Item create form on GET.

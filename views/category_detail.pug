@@ -1,0 +1,13 @@
+extends layout 
+
+block content 
+  h1 #{category.name} 
+  p #[strong Description:] #{category.description}
+
+  div(style='margin-left:20px;margin-top:20px')
+    h4 Category items 
+
+    each item in items
+      hr
+      li 
+        a(href=item.url) #{item.name}
