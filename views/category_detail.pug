@@ -5,9 +5,22 @@ block content
   p #[strong Description:] #{category.description}
 
   div(style='margin-left:20px;margin-top:20px')
-    h4 Category items 
+    
+    if items.length > 0
+      h4 Category items 
+      each item in items
+        hr
+        li 
+          a(href=item.url) #{item.name}
+  
+  form(method='POST' action=`/inventory/category/${category._id}/delete`)
+      div.form-group
+        input#categoryid.form-control(type='hidden',name='categoryid', required='true', value=category._id )
 
-    each item in items
-      hr
-      li 
-        a(href=item.url) #{item.name}
+      button.btn.btn-primary(type='submit') Delete category
+
+  form(method='GET' action=`/inventory/category/${category._id}/update`)
+      div.form-group
+        input#categoryid.form-control(type='hidden',name='categoryid', required='true', value=category._id )
+
+      button.btn.btn-primary(type='submit') Update category

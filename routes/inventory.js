@@ -6,7 +6,6 @@ import {
   categoryDetail,
   categoryCreateGet,
   categoryCreatePost,
-  categoryDeleteGet,
   categoryDeletePost,
   categoryUpdateGet,
   categoryUpdatePost,
@@ -17,7 +16,6 @@ import {
   itemDetail,
   itemCreateGet,
   itemCreatePost,
-  itemDeleteGet,
   itemDeletePost,
   itemUpdateGet,
   itemUpdatePost
@@ -32,9 +30,6 @@ router.get("/category/create", categoryCreateGet);
 
 // POST request for creating Category.
 router.post("/category/create", categoryCreatePost);
-
-// GET request to delete Category.
-router.get("/category/:id/delete", categoryDeleteGet);
 
 // POST request to delete Category.
 router.post("/category/:id/delete", categoryDeletePost);
@@ -64,10 +59,6 @@ router.get("/item/create", itemCreateGet);
 // POST request to create Item
 
 router.post("/item/create", itemCreatePost);
-
-// GET request to delete Item
-
-router.get("/item/:id/delete", itemDeleteGet);
 
 // POST request to delete Item.
 router.post("/item/:id/delete", itemDeletePost);

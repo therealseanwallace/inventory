@@ -1,0 +1,42 @@
+extends layout 
+
+block content 
+  h1= title 
+
+  form(method="POST" action="")
+    div.form-group 
+      label(for="name") Name: 
+      input#name.form-control(type='text', placeholder='Category name' name='name' value=(undefined===category ? '' : category.name) )
+
+    div.form-group
+      label(for='description') Description:
+      textarea#description.form-control(type='textarea', placeholder='Description' name='description' required='true') #{undefined===category ? '' : category.description}
+
+    if category
+      form(method='POST' action=`/inventory/category/${category._id}/update`)
+        div.form-group
+          input#categoryid.form-control(type='hidden',name='categorysubmit')
+
+        button.btn.btn-primary(type='submit') Submit updated category
+
+      form(method='POST' action=`/inventory/category/${category._id}/delete`)
+        div.form-group
+          input#categoryid.form-control(type='hidden',name='deletecategory')
+
+        button.btn.btn-primary(type='submit') Delete category
+    
+    else 
+      form(method='POST' action='')
+        div.form-group
+          input#categoryid.form-control(type='hidden',name='categoryid')
+
+        button.btn.btn-primary(type='submit') Submit new category
+    
+    if errors
+      ul
+        for error in errors
+          li!= error.msg
+
+      
+
+      

@@ -1,11 +1,10 @@
 import asyncHandler from "express-async-handler";
+import { body, validationResult } from "express-validator";
 import Category from "../models/category.js";
 import Item from "../models/item.js";
 
 // Display list of all Categories.
 const categoryList = asyncHandler(async (req, res, next) => {
-  // res.send("NOT IMPLEMENTED: Category list");
-
   const categories = await Category.find({});
 
   if (categories.length === 0) {
@@ -16,8 +15,8 @@ const categoryList = asyncHandler(async (req, res, next) => {
 
   res.render("all_categories", {
     title: "All categories",
-    categories
-  })
+    categories,
+  });
 });
 
 // Display detail page for a specific Category.
@@ -40,40 +39,137 @@ const categoryDetail = asyncHandler(async (req, res, next) => {
 
 // Display Category create form on GET.
 const categoryCreateGet = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category create GET");
+  res.render("category_form", {
+    title: "Create new category",
+  });
 });
 
 // Handle Category create on POST.
-const categoryCreatePost = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category create POST");
-});
+const categoryCreatePost = [
+  // Validate and sanitize fields.
+  body("name", "Name must not be empty.").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
 
-// Display Category delete form on GET.
-const categoryDeleteGet = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category delete GET");
-});
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a category object with escaped/trimmed data
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      // Modify the item object to display the incorrect value in the form field
+      errors.array().forEach((error) => {
+        category[error.path] = error.value;
+      });
+
+      res.render("category_form", {
+        title: "Create new category",
+        category,
+        errors: errors.array(),
+      });
+    } else {
+      // Form data is valid. Proceed with saving the new category.
+      await category.save();
+      res.redirect(category.url);
+    }
+  }),
+];
 
 // Handle Category delete on POST.
 const categoryDeletePost = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category delete POST");
+  const category = await Category.findById(req.params.id);
+
+  const items = await Item.find({ category: req.params.id }).exec();
+
+  if (items.length > 0) {
+    // The category contains items, therefore we will forbid deleting it
+    throw new Error("Error: category has items associated with it. Please delete the items before proceeding.")
+  }
+  if (!category) {
+    // Category not found. Redirect to categories page.
+    res.redirect("/inventory/categorys");
+  } else {
+    await category.deleteOne();
+    res.redirect("/inventory/categorys");
+  }
 });
 
 // Display Category update form on GET.
 const categoryUpdateGet = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category update GET");
+  const category = await Category.findById(req.params.id);
+
+  if (category === null) {
+    // No results
+    const err = new Error("Category not found");
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render("category_form", {
+    title: "Update category",
+    category,
+  });
 });
 
 // Handle Category update on POST.
-const categoryUpdatePost = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Category update POST");
-});
+const categoryUpdatePost = [
+  // Validate and sanitize fields.
+  body("name", "Name must not be empty.").trim().isLength({ min: 1 }).escape(),
+  body("description", "Description must not be empty.")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    // Create a category object with escaped/trimmed data
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      // Modify the item object to display the incorrect value in the form field
+      errors.array().forEach((error) => {
+        category[error.path] = error.value;
+      });
+
+      res.render("category_form", {
+        title: "Create new category",
+        category,
+        errors: errors.array(),
+      });
+    } else {
+      // Form data is valid. Proceed with saving the new category.
+      const updatedCategory = await Category.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          name: req.body.name,
+          description: req.body.description,
+        }
+      );
+      res.redirect(updatedCategory.url);
+    }
+  }),
+];
 
 export {
   categoryList,
   categoryDetail,
   categoryCreateGet,
   categoryCreatePost,
-  categoryDeleteGet,
   categoryDeletePost,
   categoryUpdateGet,
   categoryUpdatePost,

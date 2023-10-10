@@ -6,3 +6,15 @@ block content
   p #[strong Price:] #{item.price}€
   p #[strong Stock count:] #{item.stock} 
   p #[strong Description:] #{item.description}
+  
+  form(method='POST' action=`/inventory/item/${item._id}/delete`)
+      div.form-group
+        input#itemid.form-control(type='hidden',name='itemid', required='true', value=item._id )
+
+      button.btn.btn-primary(type='submit') Delete item
+
+  form(method='GET' action=`/inventory/item/${item._id}/update`)
+      div.form-group
+        input#itemid.form-control(type='hidden',name='itemid', required='true', value=item._id )
+
+      button.btn.btn-primary(type='submit') Update item
